@@ -145,7 +145,7 @@ void PieceHandler::doMovePiece(const BoardPos& targetPos){
 	if(currentPiece->getPieceType() == PieceType::ROOK){
 		for(const auto& piece : _pieces[player]){
 			if(currentPiece->getPieceType() == PieceType::KING){
-				const auto& king = static_cast<King*>(currentPiece.get());
+				const auto& king = static_cast<King*>(piece.get());
 				if(currentPiece->getBoardPos().col == Defines::QUEEN_SIDE_ROOK){
 					king->isQueenSideCastlePossible = false;
 				} else {
@@ -197,8 +197,8 @@ void PieceHandler::doMovePiece(const BoardPos& targetPos){
 	_gameBoardProxy->onPieceUngrabbed();
 
 	for( const auto& piece : _pieces[opponent] ){
-		if(currentPiece->getPieceType() == PieceType::PAWN){
-			static_cast<Pawn*>(currentPiece.get())->enPassantDanger = false;
+		if(piece->getPieceType() == PieceType::PAWN){
+			static_cast<Pawn*>(piece.get())->enPassantDanger = false;
 		}
 	}
 
