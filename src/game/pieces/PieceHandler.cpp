@@ -87,21 +87,22 @@ void PieceHandler::handlePieceUngrabbedEvent(const InputEvent& e){
 
 	for(const auto& piece : _pieces[playerId]){
 
-		if(piece->getPieceType() == PieceType::KING){
-			auto king = static_cast<King*>(piece.get());
-			std::cout << std::boolalpha << king->isCheckOnTheLeft << ' ' << king->isCheckOnTheRight << std::endl;
+		// if(piece->getPieceType() == PieceType::KING){
+		// 	auto king = static_cast<King*>(piece.get());
+		// 	std::cout << std::boolalpha << king->isCheckOnTheLeft << ' ' << king->isCheckOnTheRight << std::endl;
 
-			std::cout << std::boolalpha << king->isKingSideCastlePossible << std::endl;
-		}		
+		// 	std::cout << std::boolalpha << king->isKingSideCastlePossible << std::endl;
+		// }		
 
 		if(piece->containsEvent(e)){
 
 			_selectedPieceId = relativePieceId;
 			_isPieceGrabbed = true;
 
+			// if(auto king = dynamic_cast<King*>(piece.get())){
+			if(piece->getPieceType() == PieceType::KING){
+				auto king = static_cast<King*>(piece.get());
 
-
-			if(auto king = dynamic_cast<King*>(piece.get())){
 				if(king->isQueenSideCastlePossible && king->isKingSideCastlePossible){
 					discoverCheckNearbyKing(king);
 					king->isFreeToQueenSideRook = isFreeBetweenKingAndRook(Defines::QUEEN_SIDE_ROOK);
