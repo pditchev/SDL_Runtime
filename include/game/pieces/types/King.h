@@ -13,13 +13,13 @@
 
 class King : public ChessPiece {
 public:
-	void setBoardPos(const BoardPos& boardPos) final;
+	void setBoardPos(const BoardPos& boardPos, const bool derived = true) final;
 
 	bool isCheckOnTheLeft = false;
 	bool isCheckOnTheRight = false;
 
-	bool isQueenSideCastlePossible { true };
-	bool isKingSideCastlePossible { true };
+	bool isQueenSideCastlePossible = true;
+	bool isKingSideCastlePossible = true;
 
 	bool isFreeToQueenSideRook = false;
 	bool isFreeToKingSideRook = false;

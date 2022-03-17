@@ -13,7 +13,7 @@
 
 class Rook : public ChessPiece {
 public:
-	void setBoardPos(const BoardPos& boardPos) final;
+	// void setBoardPos(const BoardPos& boardPos) final;
 
 private:
 	std::unordered_map<Defines::Direction, MoveDirection> getBoardMoves() const final;
