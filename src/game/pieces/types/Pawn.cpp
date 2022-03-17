@@ -35,10 +35,10 @@ int32_t Pawn::init(const ChessPieceCfg& cfg) {
 	return EXIT_SUCCESS;
 }
 
-void Pawn::setBoardPos(const BoardPos& boardPos){
+void Pawn::setBoardPos(const BoardPos& boardPos, const bool derived){
 	ChessPiece::setBoardPos(boardPos);
 
-	if(_END_ROW == _boardPos.row && isPromotionAllowed){
+	if( derived && _END_ROW == _boardPos.row && isPromotionAllowed ){
 		selfPromotion(getPlayerId());
 	}
 }

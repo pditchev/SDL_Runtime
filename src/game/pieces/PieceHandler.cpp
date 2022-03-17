@@ -87,21 +87,22 @@ void PieceHandler::handlePieceUngrabbedEvent(const InputEvent& e){
 
 	for(const auto& piece : _pieces[playerId]){
 
-		if(piece->getPieceType() == PieceType::KING){
-			auto king = static_cast<King*>(piece.get());
-			std::cout << std::boolalpha << king->isCheckOnTheLeft << ' ' << king->isCheckOnTheRight << std::endl;
+		// if(piece->getPieceType() == PieceType::KING){
+		// 	auto king = static_cast<King*>(piece.get());
+		// 	std::cout << std::boolalpha << king->isCheckOnTheLeft << ' ' << king->isCheckOnTheRight << std::endl;
 
-			std::cout << std::boolalpha << king->isKingSideCastlePossible << std::endl;
-		}		
+		// 	std::cout << std::boolalpha << king->isKingSideCastlePossible << std::endl;
+		// }		
 
 		if(piece->containsEvent(e)){
 
 			_selectedPieceId = relativePieceId;
 			_isPieceGrabbed = true;
 
+			// if(auto king = dynamic_cast<King*>(piece.get())){
+			if(piece->getPieceType() == PieceType::KING){
+				auto king = static_cast<King*>(piece.get());
 
-
-			if(auto king = dynamic_cast<King*>(piece.get())){
 				if(king->isQueenSideCastlePossible && king->isKingSideCastlePossible){
 					discoverCheckNearbyKing(king);
 					king->isFreeToQueenSideRook = isFreeBetweenKingAndRook(Defines::QUEEN_SIDE_ROOK);
@@ -122,38 +123,34 @@ void PieceHandler::doMovePiece(const BoardPos& targetPos){
 
 	const auto& player = getCurrPlayerId();
 	const auto& opponent = BoardUtils::getOpponentId(player);
-	const auto& currPiece = _pieces[player][_selectedPieceId];
+	const auto& currentPiece = _pieces[player][_selectedPieceId];
 
-	const auto& pawn = dynamic_cast<Pawn*>(currPiece.get());
-	if(pawn){
+	if(currentPiece->getPieceType() == PieceType::PAWN){
+		const auto& pawn = static_cast<Pawn*>(currentPiece.get());
 		if(pawn->getBoardPos().row == pawn->getInitialRow()){
 			if(targetPos != BoardUtils::getAdjacentPos(pawn->getMoveDir(), pawn->getBoardPos())){
 				pawn->enPassantDanger = true;
 			}
 		}
 	}
-
-	int32_t collisionIdx = -1;
-	if(BoardUtils::doCollideWithPiece(targetPos, _pieces[opponent], collisionIdx)){
+	
+	if(int32_t collisionIdx = -1; BoardUtils::doCollideWithPiece(targetPos, _pieces[opponent], collisionIdx)){
 		_pieces[opponent].erase(_pieces[opponent].begin() + collisionIdx);
-	} else if(currPiece->getPieceType() == PieceType::PAWN){
+	} else if(currentPiece->getPieceType() == PieceType::PAWN){
 		if(BoardUtils::doCollideWithPawnEnPassant(targetPos, _pieces[opponent], collisionIdx )){
 			_pieces[opponent].erase(_pieces[opponent].begin() + collisionIdx);
 		}
 	}
 
-	if(currPiece->getPieceType() == PieceType::ROOK){
-		if(currPiece->getBoardPos().col == Defines::QUEEN_SIDE_ROOK){
-			for(const auto& piece : _pieces[player]){
-				if(const auto& king = dynamic_cast<King*>(piece.get())){
+	if(currentPiece->getPieceType() == PieceType::ROOK){
+		for(const auto& piece : _pieces[player]){
+			if(piece->getPieceType() == PieceType::KING){
+				const auto& king = static_cast<King*>(piece.get());
+				if(currentPiece->getBoardPos().col == Defines::QUEEN_SIDE_ROOK){
 					king->isQueenSideCastlePossible = false;
-				}
-			}
-		} else {
-			for(const auto& piece : _pieces[player]){
-				if(const auto& king = dynamic_cast<King*>(piece.get())){
+				} else {
 					king->isKingSideCastlePossible = false;
-				}
+				}			
 			}
 		}
 	}
@@ -173,34 +170,35 @@ void PieceHandler::doMovePiece(const BoardPos& targetPos){
 //		}
 //	}
 
-	if(currPiece->getPieceType() == PieceType::KING){
-		const auto& distance = currPiece->getBoardPos().col - targetPos.col;
-		if(distance > 1 ){	//Queen side castle
-			for(const auto& piece : _pieces[player]){
-				if(piece->getPieceType() == PieceType::ROOK && piece->getBoardPos().col == Defines::QUEEN_SIDE_ROOK){
-					const auto& targetPosOfRook = BoardPos(targetPos.row, targetPos.col + 1);
-					piece->setBoardPos(targetPosOfRook);
+	if(currentPiece->getPieceType() == PieceType::KING){
+	   	if(	const auto& distance = currentPiece->getBoardPos().col - targetPos.col;	//C++17 if initializer
+			distance > 1 ){	//Queen side castle
+				for(const auto& piece : _pieces[player]){
+					if(	piece->getPieceType() == PieceType::ROOK 
+						&& piece->getBoardPos().col == Defines::QUEEN_SIDE_ROOK){
+							const auto& targetPosOfRook = BoardPos(targetPos.row, targetPos.col + 1);
+							piece->setBoardPos(targetPosOfRook);
+					}
 				}
-			}
 		} else if(distance < -1){ //King side castle
-			for(const auto& piece : _pieces[player]){
-				if(piece->getPieceType() == PieceType::ROOK && piece->getBoardPos().col == Defines::KING_SIDE_ROOK){
-					const auto& targetPosOfRook = BoardPos(targetPos.row, targetPos.col - 1);
-					piece->setBoardPos(targetPosOfRook);
+				for(const auto& piece : _pieces[player]){
+					if(	piece->getPieceType() == PieceType::ROOK 
+						&& piece->getBoardPos().col == Defines::KING_SIDE_ROOK){
+							const auto& targetPosOfRook = BoardPos(targetPos.row, targetPos.col - 1);
+							piece->setBoardPos(targetPosOfRook);
+					}
 				}
-			}
 		}
 	}
 
-	currPiece->setBoardPos(targetPos);
+	currentPiece->setBoardPos(targetPos);
 	removeCheck();
 
 	_gameBoardProxy->onPieceUngrabbed();
 
 	for( const auto& piece : _pieces[opponent] ){
-		const auto& pn = dynamic_cast<Pawn*>(piece.get());
-		if( pn ){
-			pn->enPassantDanger = false;
+		if(piece->getPieceType() == PieceType::PAWN){
+			static_cast<Pawn*>(piece.get())->enPassantDanger = false;
 		}
 	}
 
@@ -279,19 +277,11 @@ bool PieceHandler::doAchieveCheck(const std::unique_ptr<ChessPiece>& piece) cons
 
 bool PieceHandler::isFreeBetweenKingAndRook(const Defines::RookDefines& rook) const {
 	const auto& player = getCurrPlayerId();
-	auto startRow = -1;
-	if(player == Defines::WHITE_PLAYER_ID){
-		startRow = Defines::WHITE_PLAYER_START_ROW;
-	} else {
-		startRow = Defines::BLACK_PLAYER_START_ROW;
-	}
 
-	auto rookCol = -1;
-	if(rook == Defines::QUEEN_SIDE_ROOK){
-		rookCol = 0;
-	} else {
-		rookCol = 7;
-	}
+	auto startRow = (player == Defines::WHITE_PLAYER_ID)
+		? Defines::WHITE_PLAYER_START_ROW : Defines::BLACK_PLAYER_START_ROW;
+
+	auto rookCol = (rook == Defines::QUEEN_SIDE_ROOK) ? 0 : 7;
 
 	for(const auto& piece : _pieces[player]){
 		if(piece->getBoardPos().row == startRow){

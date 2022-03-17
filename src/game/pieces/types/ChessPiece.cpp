@@ -41,7 +41,7 @@ bool ChessPiece::containsEvent(const InputEvent& e) const {
 	return _pieceImg.containsPoint(e.pos);
 }
 
-void ChessPiece::setBoardPos(const BoardPos& boardPos) {
+void ChessPiece::setBoardPos(const BoardPos& boardPos, [[maybe_unused]] const bool derived) {
 	_boardPos = boardPos;
 	_pieceImg.setPosition(BoardUtils::getAbsPos(_boardPos));
 }
@@ -69,7 +69,6 @@ std::vector<TileData> ChessPiece::getMoveTiles(
 	std::vector<TileData> moveTiles;
 
 	const auto boardMoves = getBoardMoves();
-
 	const auto opponentId = BoardUtils::getOpponentId(_playerId);
 
 	for (const auto& [dir, vBoardPos] : boardMoves) {
@@ -78,14 +77,13 @@ std::vector<TileData> ChessPiece::getMoveTiles(
 		}
 
 		for(const auto& boardPos : vBoardPos){
-			const TileType tileType = BoardUtils::getTileType(boardPos,
-															  activePieces[_playerId],
-															  activePieces[opponentId]);
+			const auto tileType = BoardUtils::getTileType(	boardPos,
+															activePieces[_playerId],
+															activePieces[opponentId] );
 
 			TileData tileData;
 			tileData.boardPos = boardPos;
 			tileData.tileType = tileType;
-
 
 			if(firstCall){
 				if(!isDangerOfCheck(tileData.boardPos, activePieces)){
@@ -97,7 +95,6 @@ std::vector<TileData> ChessPiece::getMoveTiles(
 					moveTiles.push_back(tileData);
 				}
 			} else {
-
 				moveTiles.push_back(tileData);
 			}
 
@@ -157,6 +154,9 @@ bool ChessPiece::isDangerOfCheck(const BoardPos& boardPos,
 			if(candidateMove.boardPos != getKingPos(activePieces[currPlayer])){
 				continue;
 			}
+			
+			// if we reached here -> we got checked ... roll back everything!!!
+
 			activePieces[currPlayer][currPiece]->setBoardPos(prevBoardPos);
 			if(oppPieceErased){
 				activePieces[opponent][collisionIdx]->setBoardPos(tempBoardPosOpp);

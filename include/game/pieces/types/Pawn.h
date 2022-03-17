@@ -23,7 +23,7 @@ public:
 				const std::array<ChessPiece::PlayerPieces, Defines::PLAYERS_COUNT> &activePieces,
 				const bool firstCall = true) const final;
 
-	void setBoardPos(const BoardPos& boardPos) final;
+	void setBoardPos(const BoardPos& boardPos, const bool derived = true) final;
 
 	int32_t getInitialRow() const;
 	Defines::Direction getMoveDir() const;

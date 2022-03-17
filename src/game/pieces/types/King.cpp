@@ -10,11 +10,13 @@
 // Own includes
 #include "game/utils/BoardUtils.h"
 
-void King::setBoardPos(const BoardPos& boardPos){
+void King::setBoardPos(const BoardPos& boardPos, const bool derived){
 	ChessPiece::setBoardPos(boardPos);
 
-	isQueenSideCastlePossible = false;
-	isKingSideCastlePossible = false;
+	if( derived ){
+		isQueenSideCastlePossible = false;
+		isKingSideCastlePossible = false;
+	}
 }
 
 std::unordered_map<Defines::Direction, MoveDirection> King::getBoardMoves() const {

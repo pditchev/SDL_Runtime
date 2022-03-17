@@ -41,7 +41,7 @@ public:
 			const std::array<ChessPiece::PlayerPieces, Defines::PLAYERS_COUNT> &activePieces,
 			const bool firstCall = true) const;
 
-	virtual void setBoardPos(const BoardPos& boardPos);
+	virtual void setBoardPos(const BoardPos& boardPos, const bool derived = false);
 
 	BoardPos getBoardPos() const;
 
