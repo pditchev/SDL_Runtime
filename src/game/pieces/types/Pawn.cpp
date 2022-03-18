@@ -35,7 +35,7 @@ int32_t Pawn::init(const ChessPieceCfg& cfg) {
 	return EXIT_SUCCESS;
 }
 
-void Pawn::setBoardPos(const BoardPos& boardPos, const bool derived){
+void Pawn::setBoardPos(const BoardPos& boardPos, [[maybe_unused]] const bool derived){
 	ChessPiece::setBoardPos(boardPos);
 
 	if( derived && _END_ROW == _boardPos.row && isPromotionAllowed ){
@@ -120,7 +120,6 @@ std::vector<TileData> Pawn::getMoveTiles(
 
 	return moveTiles;
 }
-
 
 int32_t Pawn::getInitialRow() const {
 	return _INITIAL_ROW;

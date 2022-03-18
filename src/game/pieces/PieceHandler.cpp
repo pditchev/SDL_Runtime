@@ -4,7 +4,7 @@
 // C system includes
 
 // C++ system includes
-//#include <functional>
+#include <functional>
 
 // Third party includes
 
@@ -87,23 +87,15 @@ void PieceHandler::handlePieceUngrabbedEvent(const InputEvent& e){
 
 	for(const auto& piece : _pieces[playerId]){
 
-		// if(piece->getPieceType() == PieceType::KING){
-		// 	auto king = static_cast<King*>(piece.get());
-		// 	std::cout << std::boolalpha << king->isCheckOnTheLeft << ' ' << king->isCheckOnTheRight << std::endl;
-
-		// 	std::cout << std::boolalpha << king->isKingSideCastlePossible << std::endl;
-		// }		
-
 		if(piece->containsEvent(e)){
 
 			_selectedPieceId = relativePieceId;
 			_isPieceGrabbed = true;
 
-			// if(auto king = dynamic_cast<King*>(piece.get())){
 			if(piece->getPieceType() == PieceType::KING){
 				auto king = static_cast<King*>(piece.get());
 
-				if(king->isQueenSideCastlePossible && king->isKingSideCastlePossible){
+				if(king->isQueenSideCastlePossible || king->isKingSideCastlePossible){
 					discoverCheckNearbyKing(king);
 					king->isFreeToQueenSideRook = isFreeBetweenKingAndRook(Defines::QUEEN_SIDE_ROOK);
 					king->isFreeToKingSideRook = isFreeBetweenKingAndRook(Defines::KING_SIDE_ROOK);
@@ -146,9 +138,9 @@ void PieceHandler::doMovePiece(const BoardPos& targetPos){
 		for(const auto& piece : _pieces[player]){
 			if(piece->getPieceType() == PieceType::KING){
 				const auto& king = static_cast<King*>(piece.get());
-				if(currentPiece->getBoardPos().col == Defines::QUEEN_SIDE_ROOK){
+				if( currentPiece->getBoardPos().col == Defines::QUEEN_SIDE_ROOK){
 					king->isQueenSideCastlePossible = false;
-				} else {
+				} else if( currentPiece->getBoardPos().col == Defines::KING_SIDE_ROOK ){
 					king->isKingSideCastlePossible = false;
 				}			
 			}
@@ -191,7 +183,7 @@ void PieceHandler::doMovePiece(const BoardPos& targetPos){
 		}
 	}
 
-	currentPiece->setBoardPos(targetPos);
+	currentPiece->setBoardPos(targetPos, true);
 	removeCheck();
 
 	_gameBoardProxy->onPieceUngrabbed();

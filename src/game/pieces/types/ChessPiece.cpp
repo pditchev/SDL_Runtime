@@ -122,6 +122,7 @@ bool ChessPiece::isDangerOfCheck(const BoardPos& boardPos,
 		static_cast<const Pawn*>(this)->isPromotionAllowed = false;
 	}
 
+	// if we can attack -> let's attack:
 	int32_t collisionIdx = -1;
 	if(BoardUtils::doCollideWithPiece(targetPos, activePieces[opponent], collisionIdx)){
 		tempBoardPosOpp = activePieces[opponent][collisionIdx]->getBoardPos();
@@ -135,6 +136,7 @@ bool ChessPiece::isDangerOfCheck(const BoardPos& boardPos,
 		}
 	}
 
+	// let's move to the new position:
 	int32_t currPiece = -1;
 	BoardPos prevBoardPos;
 	for(const auto& piece : activePieces[currPlayer]){
@@ -146,6 +148,17 @@ bool ChessPiece::isDangerOfCheck(const BoardPos& boardPos,
 		}
 	}
 
+	auto rollback = [&] {	
+		activePieces[currPlayer][currPiece]->setBoardPos(prevBoardPos);
+		if(oppPieceErased){
+			activePieces[opponent][collisionIdx]->setBoardPos(tempBoardPosOpp);
+		}
+		if(getPieceType() == PieceType::PAWN){
+			static_cast<const Pawn*>(this)->isPromotionAllowed = true;
+		}
+	};
+
+	//let's check if we opened a hole :(
 	for(const auto& attackers : activePieces[opponent]){
 
 		const auto& possibleMoves = attackers->getMoveTiles(activePieces, false);
@@ -155,27 +168,18 @@ bool ChessPiece::isDangerOfCheck(const BoardPos& boardPos,
 				continue;
 			}
 			
-			// if we reached here -> we got checked ... roll back everything!!!
+			// if we reached here -> we can be checked ... roll back everything!!!
+			rollback();
 
-			activePieces[currPlayer][currPiece]->setBoardPos(prevBoardPos);
-			if(oppPieceErased){
-				activePieces[opponent][collisionIdx]->setBoardPos(tempBoardPosOpp);
-			}
-			if(getPieceType() == PieceType::PAWN){
-				static_cast<const Pawn*>(this)->isPromotionAllowed = true;
-			}
+			// ...and announce: "there is danger of being checked":
 			return true;
 		}
 	}
 
-	activePieces[currPlayer][currPiece]->setBoardPos(prevBoardPos);
-	if(oppPieceErased){
-		activePieces[opponent][collisionIdx]->setBoardPos(tempBoardPosOpp);
-	}
-	if(getPieceType() == PieceType::PAWN){
-		static_cast<const Pawn*>(this)->isPromotionAllowed = true;
-	}
+	// if we got here -> no problem discovered, and again ... roll back everything:
+	rollback();
 
+	// ... and announce: "everything is OK! no check is possible":
 	return false;
 }
 

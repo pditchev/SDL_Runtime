@@ -159,12 +159,11 @@ int32_t populateBlackPieces(int32_t rsrcId,
 
 } //end of namespace
 
-
 int32_t PieceHandlerPopulator::populatePieceHandler(int32_t whitePiecesRsrcId,
 													int32_t blackPiecesRsrcId,
 													int32_t unfinishedPieceTextId,
 													std::array<ChessPiece::PlayerPieces,
-															Defines::PLAYERS_COUNT> &outPieces){
+														Defines::PLAYERS_COUNT> &outPieces){
 
 	ChessPiece::PlayerPieces& whites = outPieces[Defines::WHITE_PLAYER_ID];
 	if(EXIT_SUCCESS != populateWhitePieces(whitePiecesRsrcId,
@@ -187,7 +186,8 @@ int32_t PieceHandlerPopulator::populatePieceHandler(int32_t whitePiecesRsrcId,
 int32_t PieceHandlerPopulator::promotePiece(PieceType pieceType,
 											int32_t playerId,
 											int32_t oldPieceId,
-											std::array<ChessPiece::PlayerPieces, Defines::PLAYERS_COUNT> &outPieces ) {
+											std::array<ChessPiece::PlayerPieces,
+												Defines::PLAYERS_COUNT> &outPieces ) {
 
 	auto rsrcId = (playerId == Defines::WHITE_PLAYER_ID) ?
 			TextureId::WHITE_PIECES : TextureId::BLACK_PIECES;

@@ -10,10 +10,6 @@
 // Own includes
 #include "game/utils/BoardUtils.h"
 
-// void Rook::setBoardPos(const BoardPos& boardPos){
-// 	ChessPiece::setBoardPos(boardPos);
-// }
-
 std::unordered_map<Defines::Direction, MoveDirection> Rook::getBoardMoves() const {
 	std::unordered_map<Defines::Direction, MoveDirection> boardMoves;
 	for(const auto& dir : rookDirs){
