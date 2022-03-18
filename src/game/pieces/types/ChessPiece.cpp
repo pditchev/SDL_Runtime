@@ -176,7 +176,7 @@ bool ChessPiece::isDangerOfCheck(const BoardPos& boardPos,
 		}
 	}
 
-	// no problem discovered, and again ... roll back everything:
+	// if we got here -> no problem discovered, and again ... roll back everything:
 	rollback();
 
 	// ... and announce: "everything is OK! no check is possible":
