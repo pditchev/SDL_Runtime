@@ -75,7 +75,8 @@ int32_t Game::init(const GameCfg& cfg){
 
 			piece->isCurrPlayerInCheck = std::bind(&GameLogic::isCheckAnnonced, &_gameLogic);
 
-			if(const auto& pawn = dynamic_cast<Pawn*>(piece.get())){
+			if(piece->getPieceType() == PieceType::PAWN){
+				const auto& pawn = static_cast<Pawn*>(piece.get());
 				pawn->selfPromotion = std::bind(&PiecePromotionPanel::activate,
 												&_piecePromotionPanel,
 												std::placeholders::_1);
