@@ -1,5 +1,4 @@
 /build/
-cmake_helpers/
 .vscode/
 .ninja*
 *.so
